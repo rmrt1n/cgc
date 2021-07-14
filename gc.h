@@ -3,20 +3,28 @@
 
 #include <stddef.h>
 
-#define GC_BASE_SIZE 8
-#define PTRSIZE (sizeof(char *))
+// gc base values
+#define GC_BASE_SIZE 64
+#define GC_BASE_LIMIT 128000 // 128kb gc threshold 
+// global gc member aliases
+#define GLOBAL_GC_BOS GLOBAL_GC.bos
+#define GLOBAL_GC_SIZE GLOBAL_GC.size
+#define GLOBAL_GC_USED GLOBAL_GC.used
+#define GLOBAL_GC_LIMIT GLOBAL_GC.limit
+#define GLOBAL_GC_STORED GLOBAL_GC.stored
+#define GLOBAL_GC_PTRS GLOBAL_GC.ptrs
 
 typedef struct Allocd {
     void *ptr;
-    size_t size;
-    char marked;
+    size_t size : 63;
+    char marked : 1;
     struct Allocd *next;
 } Allocd;
 
 typedef struct GarbageCollector {
     void *bos;
-    int size;
-    int used;
+    unsigned int size, used;
+    size_t limit, stored;
     Allocd **ptrs;
 } GarbageCollector;
 
