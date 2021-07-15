@@ -8,11 +8,11 @@ char *test() {
 }
 
 int main(int argc, char **argv) {
+    (void)argv; // to supress -Wunused-parameter
     gc_start(&argc); 
     char *s = test();
-    printf("addr of s %p\n", s);
-    // strcpy(s, "hello");
-    // puts(s);
+    strcpy(s, "hello");
+    puts(s);
     gc_stop();
     return 0;
 }

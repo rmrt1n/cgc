@@ -22,15 +22,15 @@ void gc_start(void *bos) {
 
 void gc_stop() {
     gc_run();
-    for (unsigned int i = 0; i < GLOBAL_GC.size; i++) {
-        Allocd *cur = GLOBAL_GC.ptrs[i];
+    for (unsigned int i = 0; i < GLOBAL_GC_SIZE; i++) {
+        Allocd *cur = GLOBAL_GC_PTRS[i];
         while (cur != NULL) {
             Allocd *tmp = cur;
             cur = cur->next;
             free(tmp);
         }
     }
-    free(GLOBAL_GC.ptrs);
+    free(GLOBAL_GC_PTRS);
 }
 
 static int is_marked(Allocd *a) {
@@ -38,13 +38,15 @@ static int is_marked(Allocd *a) {
 }
 
 static void gc_mark(void *start, void *end) {
-    uintptr_t p = (uintptr_t)start;
-    for (; p < (uintptr_t)end; p++) {
-            printf("search %p\n", *(void **)p);
-        Allocd *cur = gc_ht_get(*((void **)p));
-        if (cur != NULL && !is_marked(cur)) {
-            cur->marked = 1;
-            gc_mark(cur->ptr, cur->ptr + cur->size);
+    for (uintptr_t p = (uintptr_t)start; p < (uintptr_t)end; p++) {
+        void *ptr = *((void **)p);
+        Allocd *cur = gc_ht_get(ptr);
+        while (cur != NULL) {
+            if (cur->ptr == ptr && !is_marked(cur)) {
+                cur->marked = 1;
+                gc_mark(cur->ptr, cur->ptr + cur->size);
+            }
+            cur = cur->next;
         }
     }
 }
@@ -57,8 +59,8 @@ static void gc_sweep() {
                 cur->marked = 0;
                 cur = cur->next;
             } else {
-                free(cur->ptr);
                 Allocd *tmp = cur->next;
+                free(cur->ptr);
                 gc_ht_del(cur->ptr);
                 cur = tmp;
             }
