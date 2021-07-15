@@ -1,5 +1,7 @@
 # cgc
-This is a barebones garbage collector for C. The only test I did for it is 
-in the main.c file, so I'm not even sure if it's correct. The output of 
-valgrind's memcheck said that all heap blocks were freed, so I'm assuming 
-it somewhat works. Needs more testing to verify.
+This is a barebones garbage collector for C. It is a simple stop-the-world, 
+mark and sweep GC for learning purposes. Example usage is in the 
+[main.c](https://github.com/rmrt1n/cgc/blob/main/main.c) file. The output of 
+valgrind's memcheck said that all heap blocks were freed, so I'm assuming it 
+works. 
+
